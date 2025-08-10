@@ -64,10 +64,9 @@
   "intent": "bus_info",
   "utterances": ["bus", "autobus", "coach", "public transport"],
   "answer_template": "Nearby bus stops: Via Cavour and Piazza Venezia connect to many city routes (40, 64, 170, H). Tickets are available at tobacco shops and newsstands."
-}
-
-  {
-    "faq_id": "EAT",
+},
+{
+   "faq_id": "EAT",
     "intent": "where_to_eat",
     "utterances": ["food","eat","restaurant","restaurants","dinner","lunch","pasta","pizza"],
     "answer_template": "{eat_recommendations}"
