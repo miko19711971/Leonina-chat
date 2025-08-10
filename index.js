@@ -94,7 +94,7 @@ main{padding:16px;min-height:calc(100vh - 140px)}
 const chat=document.getElementById('chat');const input=document.getElementById('input');const sendBtn=document.getElementById('sendBtn');
 function add(t,w='bot'){const d=document.createElement('div');d.className='msg '+w;d.textContent=t;chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
 function quick(items){const w=document.createElement('div');w.className='quick';for(const it of items){const b=document.createElement('button');b.textContent=it;b.onclick=()=>{input.value=it;send()};w.appendChild(b)}chat.appendChild(w)}
-add('Welcome! I can help with Wi‑Fi, water, TV, trash, check‑in/out. (Multilingual)');quick(['wifi','water','TV','trash','check in','check out']);
+add('Welcome! I can help with Wi‑Fi, water, TV, trash, check‑in/out. (Multilingual)');quick(['wifi','water','TV','trash','check in','check out','restaurants','drinks','shopping','what to visit','hidden gems','emergency']);
 sendBtn.addEventListener('click',send);input.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
 async function send(){const text=input.value.trim();if(!text)return;add(text,'user');input.value='';try{const r=await fetch('/api/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,aptId:'LEONINA71'})});const data=await r.json();if(data.error)throw new Error(data.error);add(data.text||'Ok.')}catch(e){add('Sorry, temporary issue. Please try again later.')}}
 </script></body></html>`;
