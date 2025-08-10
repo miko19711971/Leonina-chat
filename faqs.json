@@ -47,13 +47,24 @@
     "utterances": ["trash","rubbish","garbage","recycling","bins"],
     "answer_template": "{trash_rules}"
   },
-
   {
     "faq_id": "TRANSPORT",
     "intent": "transport",
     "utterances": ["transport","metro","subway","bus","cavour","line b","airport","fiumicino","ciampino","train","shuttle","taxi"],
     "answer_template": "Metro: {transport_metro} Bus: {transport_bus} Airport: {airport_transfer} Taxis: {useful_numbers}"
   },
+  {
+  "faq_id": "SUBWAY",
+  "intent": "subway_info",
+  "utterances": ["subway", "metro", "underground", "train", "tube"],
+  "answer_template": "The nearest metro station is Cavour (Line B), 5 minutes walking. Other nearby stops: Colosseo (Line B, 10 min), Termini (Lines A & B, 15 min)."
+},
+{
+  "faq_id": "BUS",
+  "intent": "bus_info",
+  "utterances": ["bus", "autobus", "coach", "public transport"],
+  "answer_template": "Nearby bus stops: Via Cavour and Piazza Venezia connect to many city routes (40, 64, 170, H). Tickets are available at tobacco shops and newsstands."
+}
 
   {
     "faq_id": "EAT",
