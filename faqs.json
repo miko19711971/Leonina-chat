@@ -47,6 +47,14 @@
     "utterances": ["trash","rubbish","garbage","recycling","bins"],
     "answer_template": "{trash_rules}"
   },
+
+  {
+    "faq_id": "TRANSPORT",
+    "intent": "transport",
+    "utterances": ["transport","metro","subway","bus","cavour","line b","airport","fiumicino","ciampino","train","shuttle","taxi"],
+    "answer_template": "Metro: {transport_metro} Bus: {transport_bus} Airport: {airport_transfer} Taxis: {useful_numbers}"
+  },
+
   {
     "faq_id": "EAT",
     "intent": "where_to_eat",
