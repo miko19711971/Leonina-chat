@@ -2,119 +2,79 @@
   {
     "faq_id": "WIFI",
     "intent": "wifi_password",
-    "utterances": [
-      "wifi",
-      "wi-fi",
-      "password",
-      "internet"
-    ],
-    "answer_template": "Wi‑Fi name: {wifi_ssid}. Password: {wifi_password}."
+    "utterances": ["wifi","wi-fi","internet","password","router"],
+    "answer_template": "Wi-Fi network: {wifi_ssid}. Password: {wifi_password}. {wifi_note}"
   },
   {
     "faq_id": "CHECKIN",
     "intent": "checkin_instructions",
-    "utterances": [
-      "check in",
-      "arrive",
-      "access",
-      "entrance",
-      "self check-in",
-      "door"
-    ],
-    "answer_template": "{self_checkin_instructions} Check‑in from {checkin_time}."
+    "utterances": ["check in","arrive","access","entrance","self check-in","code","door"],
+    "answer_template": "{self_checkin_instructions} Check-in from {checkin_time}."
   },
   {
     "faq_id": "CHECKOUT",
     "intent": "checkout_time",
-    "utterances": [
-      "check out",
-      "leave",
-      "departure",
-      "checkout time"
-    ],
-    "answer_template": "Checkout is at {checkout_time}. Please leave keys inside and close the door."
-  },
-  {
-    "faq_id": "TRASH",
-    "intent": "trash_rules",
-    "utterances": [
-      "trash",
-      "rubbish",
-      "bins",
-      "recycling",
-      "garbage"
-    ],
-    "answer_template": "{trash_rules}"
-  },
-  {
-    "faq_id": "APPLIANCES",
-    "intent": "appliance_help",
-    "utterances": [
-      "tv",
-      "ac",
-      "aircon",
-      "washer",
-      "washing machine",
-      "dishwasher",
-      "hot plate",
-      "umbrella"
-    ],
-    "answer_template": "{appliance_notes}"
-  },
-  {
-    "faq_id": "EMERGENCY",
-    "intent": "emergency",
-    "utterances": [
-      "emergency",
-      "help",
-      "urgent",
-      "112",
-      "problem"
-    ],
-    "answer_template": "{emergency_contacts}"
+    "utterances": ["check out","leave","departure","checkout time"],
+    "answer_template": "{checkout_instructions}"
   },
   {
     "faq_id": "WATER",
     "intent": "water_issues",
-    "utterances": [
-      "water",
-      "hot water",
-      "no water",
-      "shower"
-    ],
-    "answer_template": "If no hot water: 1) Wait 30–60s. 2) Ensure boiler is ON (green light). 3) {boiler_reset_steps}. If still no hot water: call {plumber_phone} or {emergency_contacts}. If no water at all: check the main valve under the sink and building notices."
+    "utterances": ["water","hot water","no hot water","shower","boiler"],
+    "answer_template": "{water_note} {boiler_warning} If water isn’t hot: {boiler_reset_steps} If still no hot water: call {plumber_phone} or {emergency_contacts}"
   },
   {
-    "faq_id": "TOURIST_TAX",
-    "intent": "tourist_tax",
-    "utterances": [
-      "tourist tax",
-      "city tax",
-      "tassa",
-      "tax"
-    ],
-    "answer_template": "City tax: €6 per person per night. Pay in cash before checkout or ask the host for bank/PayPal options."
+    "faq_id": "APPLIANCES",
+    "intent": "appliance_help",
+    "utterances": ["tv","ac","aircon","washer","washing machine","dishwasher","hot plate","umbrella","terrace","plants"],
+    "answer_template": "{appliance_notes} {plants_note}"
   },
   {
-    "faq_id": "ADAPTERS",
-    "intent": "adapters",
-    "utterances": [
-      "adapter",
-      "adapters",
-      "plug",
-      "power"
-    ],
-    "answer_template": "Power adapters are provided in the apartment (check near the sofa/bedside tables)."
+    "faq_id": "LIGHTS",
+    "intent": "lights",
+    "utterances": ["light","lights","kitchen light","terrace light","lamp"],
+    "answer_template": "Kitchen lights: {lighting_kitchen} Terrace lights: {lighting_terrace}"
   },
   {
-    "faq_id": "GROCERIES",
-    "intent": "groceries",
-    "utterances": [
-      "supermarket",
-      "groceries",
-      "market",
-      "food"
-    ],
-    "answer_template": "Nearby minimarkets and supermarkets are within a short walk. Ask for the nearest open store if you arrive late."
+    "faq_id": "BATHROOM",
+    "intent": "bathroom",
+    "utterances": ["bathroom","hairdryer","towels","soap","toilet paper"],
+    "answer_template": "Bathroom amenities: {bathroom_amenities} Towels: {towels_note}"
+  },
+  {
+    "faq_id": "TRASH",
+    "intent": "trash_rules",
+    "utterances": ["trash","rubbish","garbage","recycling","bins"],
+    "answer_template": "{trash_rules}"
+  },
+  {
+    "faq_id": "EAT",
+    "intent": "where_to_eat",
+    "utterances": ["food","eat","restaurant","restaurants","dinner","lunch","pasta","pizza"],
+    "answer_template": "{eat_recommendations}"
+  },
+  {
+    "faq_id": "DRINK",
+    "intent": "where_to_drink",
+    "utterances": ["drink","bar","cocktail","wine","aperitivo"],
+    "answer_template": "{drink_recommendations}"
+  },
+  {
+    "faq_id": "SHOP",
+    "intent": "shopping",
+    "utterances": ["shopping","market","boutique","souvenir","vintage"],
+    "answer_template": "{shopping_tips}"
+  },
+  {
+    "faq_id": "VISIT",
+    "intent": "what_to_visit",
+    "utterances": ["visit","see","attractions","museum","church","colosseum","forum","hidden gems"],
+    "answer_template": "{visit_highlights}"
+  },
+  {
+    "faq_id": "EMERGENCY",
+    "intent": "emergency",
+    "utterances": ["emergency","help","urgent","doctor","police","ambulance","fire","taxi","number","phone"],
+    "answer_template": "{useful_numbers} Host: {host_phone}."
   }
 ]
