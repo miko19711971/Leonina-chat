@@ -1,25 +1,106 @@
 {
   "LEONINA71": {
-    "apartment_id": "LEONINA71",
-    "name": "Via Leonina 71",
-    "address": "Via Leonina 71, Rome",
-    "checkin_time": "15:00",
-    "checkout_time": "11:00",
-    "wifi_ssid": "See router label",
-    "wifi_password": "See router label",
-    "self_checkin_instructions": "Main door: code 7171 + key symbol or round key. Apartment door: long square-ended key, pull door towards you, turn counterclockwise.",
-    "trash_rules": "Follow building bins in courtyard; separate glass, plastic, paper as posted.",
-    "appliance_notes": "AC: turn off when leaving; Hot plate: switch off after use; Terrace umbrella: tie to railing, close when away.",
-    "emergency_contacts": "Emergency 112; Host +39 335 5245756",
-    "neighborhood_tips_link": "https://niceflatinrome.com/leonina-guide",
-    "map_link": "https://maps.google.com/?q=Via+Leonina+71+Rome",
-    "languages_supported": [
-      "en",
-      "it",
-      "fr",
-      "es"
+    "general_info": {
+      "name": "Via Leonina 71",
+      "address": "Via Leonina 71, Rome, Italy",
+      "contact_phone": "+39 335 5245756",
+      "website": "https://niceflatinrome.com",
+      "description": "Elegant apartment in the heart of Monti, a short walk from the Colosseum and Roman Forum. Perfect for exploring Rome’s history, culture, and nightlife."
+    },
+    "wifi": {
+      "network": "Your-WiFi-Network",
+      "password": "Your-WiFi-Password",
+      "note": "Router is located near the living room shelf. Restart if connection is slow."
+    },
+    "check_in": {
+      "standard_time": "From 15:00",
+      "instructions": "Main door: code 7171 + key symbol or round key. Apartment door: use the long square-ended key, pull the door towards you, and turn counterclockwise.",
+      "early_check_in": "Available on request, subject to availability."
+    },
+    "check_out": {
+      "standard_time": "By 11:00 AM",
+      "instructions": "Leave the keys on the table inside, close the door, and ensure lights, AC, and appliances are switched off.",
+      "late_check_out": "Available on request, subject to availability."
+    },
+    "rules": [
+      "Turn off AC and lights when leaving.",
+      "Switch off hot plate after use.",
+      "Tie the terrace umbrella to the railing and close it when away.",
+      "No smoking inside the apartment.",
+      "No parties or loud noises after 10 PM."
     ],
-    "plumber_phone": "+39 335 5245756",
-    "boiler_reset_steps": "Do not touch the switch near bathroom mirror; hot water always available."
+    "where_to_eat": [
+      {
+        "name": "La Taverna dei Fori Imperiali",
+        "address": "Via della Madonna dei Monti 9",
+        "phone": "+39 06 679 8643",
+        "website": "https://www.latavernadeiforiimperiali.com",
+        "description": "Family-run Roman trattoria with authentic local dishes."
+      },
+      {
+        "name": "Ai Tre Scalini",
+        "address": "Via Panisperna 251",
+        "phone": "+39 06 4890 7495",
+        "description": "Historic wine bar serving Roman specialties."
+      }
+    ],
+    "where_to_drink": [
+      {
+        "name": "Blackmarket Hall",
+        "address": "Via Panisperna 101",
+        "description": "Stylish cocktail bar with live music."
+      },
+      {
+        "name": "La Barrique",
+        "address": "Via del Boschetto 41",
+        "description": "Cozy wine bar with an excellent selection."
+      }
+    ],
+    "shopping": [
+      {
+        "name": "Pifebo",
+        "address": "Via dei Serpenti 141",
+        "description": "Vintage clothing and accessories."
+      },
+      {
+        "name": "Artisanal Shops on Via Urbana",
+        "description": "Handcrafted jewelry, ceramics, and leather goods."
+      }
+    ],
+    "hidden_gems": [
+      {
+        "name": "Basilica di San Pietro in Vincoli",
+        "description": "Famous for Michelangelo's statue of Moses."
+      },
+      {
+        "name": "Vicolo Scellerato",
+        "description": "Historic alley with a dark past from Ancient Rome."
+      },
+      {
+        "name": "Torre delle Milizie",
+        "description": "Medieval tower offering panoramic views."
+      }
+    ],
+    "attractions": [
+      {
+        "name": "Colosseum",
+        "description": "Iconic ancient Roman amphitheater, 10 min walk."
+      },
+      {
+        "name": "Roman Forum",
+        "description": "Archaeological site of ancient Rome, 12 min walk."
+      },
+      {
+        "name": "Piazza Venezia",
+        "description": "Central square with the Altare della Patria monument."
+      }
+    ],
+    "useful_numbers": {
+      "emergency": "112",
+      "police": "113",
+      "ambulance": "118",
+      "taxi": "+39 060609",
+      "tourist_info": "+39 060608"
+    }
   }
 }
