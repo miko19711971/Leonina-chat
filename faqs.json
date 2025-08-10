@@ -1,0 +1,120 @@
+[
+  {
+    "faq_id": "WIFI",
+    "intent": "wifi_password",
+    "utterances": [
+      "wifi",
+      "wi-fi",
+      "password",
+      "internet"
+    ],
+    "answer_template": "Wi‑Fi name: {wifi_ssid}. Password: {wifi_password}."
+  },
+  {
+    "faq_id": "CHECKIN",
+    "intent": "checkin_instructions",
+    "utterances": [
+      "check in",
+      "arrive",
+      "access",
+      "entrance",
+      "self check-in",
+      "door"
+    ],
+    "answer_template": "{self_checkin_instructions} Check‑in from {checkin_time}."
+  },
+  {
+    "faq_id": "CHECKOUT",
+    "intent": "checkout_time",
+    "utterances": [
+      "check out",
+      "leave",
+      "departure",
+      "checkout time"
+    ],
+    "answer_template": "Checkout is at {checkout_time}. Please leave keys inside and close the door."
+  },
+  {
+    "faq_id": "TRASH",
+    "intent": "trash_rules",
+    "utterances": [
+      "trash",
+      "rubbish",
+      "bins",
+      "recycling",
+      "garbage"
+    ],
+    "answer_template": "{trash_rules}"
+  },
+  {
+    "faq_id": "APPLIANCES",
+    "intent": "appliance_help",
+    "utterances": [
+      "tv",
+      "ac",
+      "aircon",
+      "washer",
+      "washing machine",
+      "dishwasher",
+      "hot plate",
+      "umbrella"
+    ],
+    "answer_template": "{appliance_notes}"
+  },
+  {
+    "faq_id": "EMERGENCY",
+    "intent": "emergency",
+    "utterances": [
+      "emergency",
+      "help",
+      "urgent",
+      "112",
+      "problem"
+    ],
+    "answer_template": "{emergency_contacts}"
+  },
+  {
+    "faq_id": "WATER",
+    "intent": "water_issues",
+    "utterances": [
+      "water",
+      "hot water",
+      "no water",
+      "shower"
+    ],
+    "answer_template": "If no hot water: 1) Wait 30–60s. 2) Ensure boiler is ON (green light). 3) {boiler_reset_steps}. If still no hot water: call {plumber_phone} or {emergency_contacts}. If no water at all: check the main valve under the sink and building notices."
+  },
+  {
+    "faq_id": "TOURIST_TAX",
+    "intent": "tourist_tax",
+    "utterances": [
+      "tourist tax",
+      "city tax",
+      "tassa",
+      "tax"
+    ],
+    "answer_template": "City tax: €6 per person per night. Pay in cash before checkout or ask the host for bank/PayPal options."
+  },
+  {
+    "faq_id": "ADAPTERS",
+    "intent": "adapters",
+    "utterances": [
+      "adapter",
+      "adapters",
+      "plug",
+      "power"
+    ],
+    "answer_template": "Power adapters are provided in the apartment (check near the sofa/bedside tables)."
+  },
+  {
+    "faq_id": "GROCERIES",
+    "intent": "groceries",
+    "utterances": [
+      "supermarket",
+      "groceries",
+      "market",
+      "food"
+    ],
+    "answer_template": "Nearby minimarkets and supermarkets are within a short walk. Ask for the nearest open store if you arrive late."
+  }
+]

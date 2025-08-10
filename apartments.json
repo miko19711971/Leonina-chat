@@ -1,0 +1,25 @@
+{
+  "LEONINA71": {
+    "apartment_id": "LEONINA71",
+    "name": "Via Leonina 71",
+    "address": "Via Leonina 71, Rome",
+    "checkin_time": "15:00",
+    "checkout_time": "11:00",
+    "wifi_ssid": "See router label",
+    "wifi_password": "See router label",
+    "self_checkin_instructions": "Main door: code 7171 + key symbol or round key. Apartment door: long square-ended key, pull door towards you, turn counterclockwise.",
+    "trash_rules": "Follow building bins in courtyard; separate glass, plastic, paper as posted.",
+    "appliance_notes": "AC: turn off when leaving; Hot plate: switch off after use; Terrace umbrella: tie to railing, close when away.",
+    "emergency_contacts": "Emergency 112; Host +39 335 5245756",
+    "neighborhood_tips_link": "https://niceflatinrome.com/leonina-guide",
+    "map_link": "https://maps.google.com/?q=Via+Leonina+71+Rome",
+    "languages_supported": [
+      "en",
+      "it",
+      "fr",
+      "es"
+    ],
+    "plumber_phone": "+39 335 5245756",
+    "boiler_reset_steps": "Do not touch the switch near bathroom mirror; hot water always available."
+  }
+}

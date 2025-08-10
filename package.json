@@ -1,0 +1,14 @@
+{
+  "name": "leonina-chat",
+  "version": "1.0.0",
+  "description": "Guest assistant for Via Leonina 71 (flat repo)",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "openai": "^4.53.0"
+  }
+}
