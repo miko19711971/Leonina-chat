@@ -40,6 +40,11 @@
     "drink_recommendations": "Blackmarket Hall (cocktails, Via Panisperna 101). La Barrique (wine bar, Via del Boschetto 41). Piazza Madonna dei Monti for aperitivo.",
     "shopping_tips": "Mercato Monti (weekend vintage & designers, Via Leonina 46). Via del Boschetto & Via Urbana: artisanal boutiques and leather goods.",
     "visit_highlights": "Colosseum (10 min), Roman Forum (12 min), San Pietro in Vincoli (Michelangelo’s Moses). Hidden gems: Santa Prassede mosaics; Scalinata dei Borgia; underground of San Martino ai Monti (guided).",
+
+    "transport_metro": "Metro Line B – Cavour station (≈5 min walk).", 
+    "transport_bus": "Bus 75, 117, 84 along Via Cavour for central Rome connections.", 
+    "airport_transfer": "Fiumicino (FCO): Leonardo Express to Termini, then Metro B one stop to Cavour. Ciampino (CIA): shuttle bus to Termini, then Metro B to Cavour.",
+
     "useful_numbers": "Emergency 112 • Police 113 • Ambulance 118 • Fire 115 • Taxi 06 3570 • City info 06 0606."
   }
 }
