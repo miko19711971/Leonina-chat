@@ -2,97 +2,79 @@
   {
     "faq_id": "WIFI",
     "intent": "wifi_password",
-    "utterances": ["wifi","wi-fi","internet","password","router"],
-    "answer_template": "Wi-Fi network: {wifi_ssid}. Password: {wifi_password}. {wifi_note}"
+    "utterances": ["wifi","wi-fi","wi fi","internet","password","router","network"],
+    "answer_template": "Wi-Fi\n• Network (SSID): {wifi_ssid}\n• Password: {wifi_password}\nTips\n• If slow: toggle Wi-Fi or move closer to the router.\n• If it drops: power the router OFF 10s → ON; wait 2–3 min.\nNeed help? Call {host_phone}."
   },
   {
     "faq_id": "CHECKIN",
     "intent": "checkin_instructions",
-    "utterances": ["check in","arrive","access","entrance","self check-in","code","door"],
-    "answer_template": "{self_checkin_instructions} Check-in from {checkin_time}."
+    "utterances": ["check in","arrive","access","entrance","self check-in","code","door","keys"],
+    "answer_template": "Check-in (from {checkin_time})\n• Building: code 7171 + key symbol (or round key).\n• Apartment: long square-ended key; pull door gently TOWARDS you, turn counter-clockwise.\n• If stuck: lift handle slightly and retry.\nNeed help? Call {host_phone}."
   },
   {
     "faq_id": "CHECKOUT",
     "intent": "checkout_time",
-    "utterances": ["check out","leave","departure","checkout time"],
-    "answer_template": "{checkout_instructions}"
+    "utterances": ["check out","leave","departure","checkout time","key return"],
+    "answer_template": "Check-out (by {checkout_time})\n• Leave keys on the table.\n• Switch OFF AC, lights, hot plate.\n• Close windows/doors; take out full trash.\nThank you! For issues: {host_phone}."
   },
   {
     "faq_id": "WATER",
     "intent": "water_issues",
-    "utterances": ["water","hot water","no hot water","shower","boiler"],
-    "answer_template": "{water_note} {boiler_warning} If water isn’t hot: {boiler_reset_steps} If still no hot water: call {plumber_phone} or {emergency_contacts}"
+    "utterances": ["water","hot water","no hot water","shower","boiler","tap"],
+    "answer_template": "Water\n• Cold water is drinkable.\n• Hot water should be available.\nDo NOT touch: {boiler_warning}\nNo hot water?\n1) Run the tap 30–60s.\n2) Check boiler light is ON.\n3) Wait 2–3 min and retry.\nStill no hot water? Call {plumber_phone} or {host_phone}."
   },
   {
     "faq_id": "APPLIANCES",
     "intent": "appliance_help",
-    "utterances": ["tv","ac","aircon","washer","washing machine","dishwasher","hot plate","umbrella","terrace","plants"],
-    "answer_template": "{appliance_notes} {plants_note}"
+    "utterances": ["tv","television","ac","aircon","air conditioning","washer","washing machine","dishwasher","hot plate","umbrella","terrace","plants"],
+    "answer_template": "Appliances & Terrace\n• AC: set 23–24°C; turn OFF when leaving.\n• TV: if “No Signal”, check input/HDMI and power.\n• Hot plate: never leave pots unattended; switch OFF after use.\n• Umbrella: tie to railing; ALWAYS close when away (wind risk).\n• Plants: you may water daily (except cacti)."
   },
   {
     "faq_id": "LIGHTS",
     "intent": "lights",
-    "utterances": ["light","lights","kitchen light","terrace light","lamp"],
-    "answer_template": "Kitchen lights: {lighting_kitchen} Terrace lights: {lighting_terrace}"
+    "utterances": ["light","lights","kitchen light","terrace light","lamp","switch"],
+    "answer_template": "Lights\n• Kitchen: switch on the right side of the stairs (facing kitchen).\n• Terrace: switch inside, on the right before the terrace door."
   },
   {
     "faq_id": "BATHROOM",
     "intent": "bathroom",
-    "utterances": ["bathroom","hairdryer","towels","soap","toilet paper"],
-    "answer_template": "Bathroom amenities: {bathroom_amenities} Towels: {towels_note}"
+    "utterances": ["bathroom","hairdryer","towels","soap","toilet paper","bath mat"],
+    "answer_template": "Bathroom\n• Amenities: {bathroom_amenities}\n• Towels: {towels_note}"
   },
   {
     "faq_id": "TRASH",
     "intent": "trash_rules",
-    "utterances": ["trash","rubbish","garbage","recycling","bins"],
-    "answer_template": "{trash_rules}"
+    "utterances": ["trash","garbage","rubbish","recycling","bins","waste"],
+    "answer_template": "Trash & Recycling\n• Use courtyard bins.\n• Separate glass, plastic/metal, paper (see signs).\n• General waste: daily.\nPlease do not leave trash on the terrace."
   },
   {
     "faq_id": "TRANSPORT",
     "intent": "transport",
-    "utterances": ["transport","metro","subway","bus","cavour","line b","airport","fiumicino","ciampino","train","shuttle","taxi"],
-    "answer_template": "Metro: {transport_metro} Bus: {transport_bus} Airport: {airport_transfer} Taxis: {useful_numbers}"
+    "utterances": ["transport","metro","subway","bus","cavour","line b","train","tickets","atac"],
+    "answer_template": "Transport\n• Metro: Cavour (Line B) ≈ 5 min walk.\n• Buses: Via Cavour (e.g., 75/117/84) to center.\n• Tickets: Tabacchi/edicolà or ATAC app; validate on board."
   },
   {
-  "faq_id": "SUBWAY",
-  "intent": "subway_info",
-  "utterances": ["subway", "metro", "underground", "train", "tube"],
-  "answer_template": "The nearest metro station is Cavour (Line B), 5 minutes walking. Other nearby stops: Colosseo (Line B, 10 min), Termini (Lines A & B, 15 min)."
-},
-{
-  "faq_id": "BUS",
-  "intent": "bus_info",
-  "utterances": ["bus", "autobus", "coach", "public transport"],
-  "answer_template": "Nearby bus stops: Via Cavour and Piazza Venezia connect to many city routes (40, 64, 170, H). Tickets are available at tobacco shops and newsstands."
-},
-{
-   "faq_id": "EAT",
+    "faq_id": "AIRPORT",
+    "intent": "airport",
+    "utterances": ["airport","fiumicino","ciampino","leonardo express","shuttle","taxi airport"],
+    "answer_template": "Airports\n• FCO: Leonardo Express → Termini → Metro B to Cavour (1 stop) or 12–15 min walk.\n• CIA: shuttle bus → Termini → Metro B to Cavour.\n• Taxis: fixed airport fares (use official white taxis)."
+  },
+  {
+    "faq_id": "EAT",
     "intent": "where_to_eat",
     "utterances": ["food","eat","restaurant","restaurants","dinner","lunch","pasta","pizza"],
-    "answer_template": "{eat_recommendations}"
-  },
-  {
-    "faq_id": "DRINK",
-    "intent": "where_to_drink",
-    "utterances": ["drink","bar","cocktail","wine","aperitivo"],
-    "answer_template": "{drink_recommendations}"
-  },
-  {
-    "faq_id": "SHOP",
-    "intent": "shopping",
-    "utterances": ["shopping","market","boutique","souvenir","vintage"],
-    "answer_template": "{shopping_tips}"
+    "answer_template": "Where to eat (nearby)\n• La Taverna dei Fori Imperiali – classic Roman (+39 06 679 8643)\n• Ai Tre Scalini – wine bar & small plates (+39 06 4890 7495)\n• Blackmarket Hall – cocktails\n• La Barrique – cozy wine bar"
   },
   {
     "faq_id": "VISIT",
     "intent": "what_to_visit",
-    "utterances": ["visit","see","attractions","museum","church","colosseum","forum","hidden gems"],
-    "answer_template": "{visit_highlights}"
+    "utterances": ["visit","see","attractions","museum","church","colosseum","forum","hidden gems","what to visit","sights"],
+    "answer_template": "What to visit (walkable)\n• Colosseum ≈10 min; Roman Forum ≈12 min.\n• San Pietro in Vincoli (Michelangelo’s Moses).\nHidden gems\n• Santa Prassede mosaics; Scalinata dei Borgia.\n• Underground of San Martino ai Monti (guided)."
   },
   {
     "faq_id": "EMERGENCY",
     "intent": "emergency",
     "utterances": ["emergency","help","urgent","doctor","police","ambulance","fire","taxi","number","phone"],
-    "answer_template": "{useful_numbers} Host: {host_phone}."
+    "answer_template": "Useful numbers\n• Emergency (EU): 112\n• Police: 113 | Ambulance: 118 | Fire: 115\n• Taxi: 06 3570 | City info: 06 0606\nHost: {host_phone}"
   }
 ]
