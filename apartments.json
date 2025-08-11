@@ -7,44 +7,45 @@
     "checkin_time": "15:00",
     "checkout_time": "11:00",
 
-    "self_checkin_instructions": "Main building door: code 7171 + key symbol (or round key). Apartment door: use the long square-ended key; pull the heavy door towards you and turn counter-clockwise to open.",
-    "checkout_instructions": "Please check out by 11:00. Leave the keys on the table, switch off AC, lights and hot plate, and close the door.",
+    "self_checkin_instructions": "BUILDING: enter with code 7171 + key symbol (or use the round key). APARTMENT: use the long square-ended key; pull the heavy door gently TOWARDS you, then turn counter-clockwise until it opens. If stuck, lift the handle slightly and try again.",
+    "checkout_instructions": "By 11:00 please: 1) leave keys on the table; 2) switch OFF AC, lights and hot plate; 3) close windows/doors; 4) take out general waste if full. Thank you!",
 
-    "wifi_ssid": "See router label on the back",
-    "wifi_password": "See router label on the back",
-    "wifi_note": "Router is on the table. If the connection is slow: toggle Wi-Fi on your phone; power-cycle the router (off 10s → on) and wait 2–3 minutes.",
+    "wifi_ssid": "See the router label on the table",
+    "wifi_password": "See the router label on the table",
+    "wifi_note": "If Wi-Fi is slow or drops: 1) toggle Wi-Fi on your phone; 2) power-cycle the router (OFF 10s → ON) and wait 2–3 minutes; 3) try standing closer to the router.",
 
     "water_note": "Cold water is drinkable. Hot water should always be available.",
-    "boiler_warning": "Please do NOT touch the switch on the left side of the bathroom mirror (it controls the hot water).",
-    "boiler_reset_steps": "Run the tap 30–60s; check the boiler light is on. If problems persist, contact the host.",
+    "boiler_warning": "IMPORTANT: do NOT touch the switch on the left of the bathroom mirror — it controls hot water.",
+    "boiler_reset_steps": "If water isn’t hot: let it run 30–60s → check the boiler light is ON → wait 2–3 min and retry. Still no hot water? Call the host.",
     "plumber_phone": "+39 335 5245756",
 
-    "bathroom_amenities": "Hairdryer, bath mat, toilet paper, hand soap.",
-    "towels_note": "Beds are made. Each guest has 1 large, 1 medium, 1 small towel.",
+    "bathroom_amenities": "Hairdryer, bath mat, toilet paper, hand soap (starter set).",
+    "towels_note": "Beds are made. Each guest has 1 large, 1 medium and 1 small towel.",
 
-    "lighting_kitchen": "Switch is on the right side of the stairs (facing the kitchen).",
-    "lighting_terrace": "Switch is inside the apartment, on the right before exiting to the terrace.",
+    "lighting_kitchen": "Switch on the right side of the stairs (facing the kitchen).",
+    "lighting_terrace": "Switch inside the apartment, on the right before exiting to the terrace.",
 
-    "appliance_notes": "AC: turn off when leaving (eco 23–24°C). Electric hot plate: switch off after use; never leave pots unattended. Terrace umbrella: tie to railing and ALWAYS close when away (wind risk!). Washer/Dishwasher: prefer eco cycles.",
-    "plants_note": "If you like, feel free to water the plants daily (except cacti).",
+    "appliance_notes": "AC: set 23–24°C and turn OFF when leaving. HOT PLATE: never leave pots unattended; switch OFF after use. TV: standard TV with 2 remotes; if ‘No Signal’, ensure HDMI/source is correct and TV is ON.",
+    "plants_note": "If you like, feel free to water the plants once a day (except cacti).",
 
-    "trash_rules": "Use the courtyard bins; separate glass, plastic/metal and paper as posted. General waste daily.",
+    "trash_rules": "Use the courtyard bins. Separate glass, plastic/metal and paper per posted signs; general waste daily. Do not leave trash on the terrace (wind/animals).",
 
-    "emergency_contacts": "Emergency 112; Host +39 335 5245756.",
+    "emergency_contacts": "EU Emergency 112; Host +39 335 5245756.",
     "host_phone": "+39 335 5245756",
 
     "map_link": "https://maps.google.com/?q=Via+Leonina+71+Rome",
     "neighborhood_tips_link": "https://niceflatinrome.com/leonina-guide",
 
-    "eat_recommendations": "Nearby: La Taverna dei Fori Imperiali (Via della Madonna dei Monti 9, +39 06 679 8643) — classic Roman trattoria. Ai Tre Scalini (Via Panisperna 251, +39 06 4890 7495) — historic wine bar with small plates. Blackmarket Hall (Via Panisperna 101) — cocktails. La Barrique (Via del Boschetto 41) — cozy wine bar.",
-    "drink_recommendations": "Blackmarket Hall (cocktails, Via Panisperna 101). La Barrique (wine bar, Via del Boschetto 41). Piazza Madonna dei Monti for aperitivo.",
-    "shopping_tips": "Mercato Monti (weekend vintage & designers, Via Leonina 46). Via del Boschetto & Via Urbana: artisanal boutiques and leather goods.",
-    "visit_highlights": "Colosseum (10 min), Roman Forum (12 min), San Pietro in Vincoli (Michelangelo’s Moses). Hidden gems: Santa Prassede mosaics; Scalinata dei Borgia; underground of San Martino ai Monti (guided).",
+    "eat_recommendations": "Nearby picks: • La Taverna dei Fori Imperiali (Via della Madonna dei Monti 9, +39 06 679 8643) — classic Roman trattoria • Ai Tre Scalini (Via Panisperna 251, +39 06 4890 7495) — historic wine bar with small plates • Blackmarket Hall (Via Panisperna 101) — cocktails • La Barrique (Via del Boschetto 41) — cozy wine bar",
+    "drink_recommendations": "Aperitivo: Piazza Madonna dei Monti. Cocktails: Blackmarket Hall (Via Panisperna 101). Wine: La Barrique (Via del Boschetto 41).",
+    "shopping_tips": "Mercato Monti (weekend designers & vintage, Via Leonina 46). Via del Boschetto & Via Urbana: artisan leather, jewelry, ceramics.",
 
-    "transport_metro": "Metro Line B – Cavour station (≈5 min walk).", 
-    "transport_bus": "Bus 75, 117, 84 along Via Cavour for central Rome connections.", 
-    "airport_transfer": "Fiumicino (FCO): Leonardo Express to Termini, then Metro B one stop to Cavour. Ciampino (CIA): shuttle bus to Termini, then Metro B to Cavour.",
+    "visit_highlights": "Walkable: Colosseum (≈10 min), Roman Forum (≈12 min), San Pietro in Vincoli (Michelangelo’s Moses). Hidden gems: Santa Prassede mosaics; Scalinata dei Borgia; underground of San Martino ai Monti (guided).",
 
-    "useful_numbers": "Emergency 112 • Police 113 • Ambulance 118 • Fire 115 • Taxi 06 3570 • City info 06 0606."
+    "transport_metro": "Metro Line B — Cavour station (≈5 min walk). For Termini/Line A, go one stop to Termini.",
+    "transport_bus": "Buses on Via Cavour connect across the center (e.g., 75/117/84). Buy tickets at tobacco shops (‘Tabacchi’) or via ATAC app; validate on board.",
+    "airport_transfer": "FCO: Leonardo Express to Termini (32 min) → Metro B to Cavour (1 stop) or 12–15 min walk. CIA: shuttle bus to Termini → Metro B to Cavour. Taxis have fixed airport fares—use official white taxis.",
+
+    "useful_numbers": "Emergency 112 • Police 113 • Ambulance 118 • Fire 115 • Taxi 06 3570 • City info 06 0606"
   }
 }
