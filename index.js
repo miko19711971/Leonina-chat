@@ -116,10 +116,9 @@ app.get('/', (req, res) => {
 <body>
   <div class="wrap">
     <header>
-  <img src="logo-niceflatinrome.png" alt="NiceFlatInRome" style="height:40px; vertical-align:middle; margin-right:8px;">
-  <div class="brand">niceflatinrome.com</div>
-  <div class="apt">Apartment: LEONINA71</div>
-</header>
+      <img src="logo-niceflatinrome.png" alt="NiceFlatInRome" style="height:40px; vertical-align:middle; margin-right:8px;">
+      <div class="brand">niceflatinrome.com</div>
+      <div class="apt">Apartment: ${apt}</div>
       <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔊 Voice: Off</button>
       <select id="voiceSelect" title="Choose voice"></select>
     </header>
