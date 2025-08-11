@@ -8,21 +8,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// serve file statici dalla cartella corrente (logo, ecc.)
-app.use(express.static('.'));
-
 const apartments = JSON.parse(fs.readFileSync('./apartments.json', 'utf-8'));
-const faqs = JSON.parse(fs.readFileSync('./faqs.json', 'utf-8'));
+const faqs       = JSON.parse(fs.readFileSync('./faqs.json', 'utf-8'));
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
-const OPENAI_MODEL  = process.env.OPENAI_MODEL  || 'gpt-4o-mini';
+const OPENAI_MODEL   = process.env.OPENAI_MODEL   || 'gpt-4o-mini';
 const client = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
 // --- Helpers ---
 function normalize(s){
   if (!s) return '';
   return s.toLowerCase()
-    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // trattini strani -> '-'
+    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // varianti di trattino -> '-'
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -48,8 +45,8 @@ async function polish(raw, userMessage, apt){
   if (!client) return raw;
   const instructions = [
     'You are a concise multilingual guest assistant for a vacation rental.',
-    'Rewrite the provided answer keeping facts identical, no inventions.',
-    'Use the same language as the user and keep under 120 words unless steps are needed.'
+    'Rewrite the provided answer keeping facts identical; do not invent.',
+    'Use the same language as the user; keep under 120 words unless steps are needed.'
   ].join(' ');
   try{
     const resp = await client.responses.create({
@@ -83,7 +80,7 @@ app.post('/api/message', async (req, res) => {
   res.json({ text, intent: matched?.intent || null });
 });
 
-// --- UI (single file HTML with inline JS/CSS) ---
+// --- UI (single-file HTML+JS) ---
 app.get('/', (req, res) => {
   const apt = (req.query.apt || 'LEONINA71').toString();
   const quickButtons = [
@@ -99,119 +96,121 @@ app.get('/', (req, res) => {
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f6f6}
   .wrap{max-width:760px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-
-  /* HEADER */
-  header{
-    position:sticky;top:0;z-index:10;background:#fff;
-    padding:10px 14px;border-bottom:1px solid #eaeaea;
-    display:flex;align-items:center;gap:12px;flex-wrap:wrap
-  }
-  .h-left{display:flex;align-items:center;gap:10px;min-width:0}
-  .brand{font-weight:700;color:#a33;white-space:nowrap}
-  .brand img{height:40px;width:auto;display:block}
-  .apt{margin-left:auto;font-size:14px;opacity:.85;white-space:nowrap}
-  .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  #voiceBtn{
-    padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;
-    cursor:pointer;font-size:14px
-  }
+  header{position:sticky;top:0;background:#fff;padding:10px 14px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .h-left{display:flex;align-items:center;gap:8px}
+  .brand{font-weight:700;color:#a33}
+  .apt{margin-left:auto;font-size:14px;opacity:.85}
+  .controls{display:flex;gap:8px;width:100%}
+  img.brand{height:40px}
+  #voiceBtn{padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
   #voiceBtn[aria-pressed="true"]{background:#2b2118;color:#fff;border-color:#2b2118}
-  #voiceSelect{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:14px;max-width:240px}
-
+  select{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:14px}
   main{flex:1;padding:12px}
-  .msg{max-width:85%;line-height:1.4;border-radius:12px;padding:12px 14px;margin:8px 0;white-space:pre-wrap}
-  .msg.wd{background:#fff;border:1px solid #e6e6e6}
-  .msg.me{background:#eaf2ff;border:1px solid #cddfff;margin-left:auto}
-
+  .msg{max-width:85%;line-height:1.35;border-radius:12px;padding:10px 12px;margin:8px 0;white-space:pre-wrap}
+  .msg.wd{background:#fff;border:1px solid #e0e0e0}
+  .msg.me{background:#e8f0fe;border:1px solid #c5d5ff;margin-left:auto}
   .quick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .quick button{
-    border:1px solid #d6c5b8;background:#fff;color:#333;padding:8px 12px;
-    border-radius:14px;cursor:pointer;line-height:1;height:36px
-  }
+  .quick button{border:1px solid #d6c5b8;background:#fff;color:#333;padding:8px 12px;border-radius:12px;cursor:pointer;line-height:1;height:36px}
   .quick button:active{transform:translateY(1px)}
-
-  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #eaeaea}
+  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #e0e0e0}
   input{flex:1;padding:14px;border:1px solid #cbd5e1;border-radius:10px;outline:none}
   #sendBtn{padding:14px;border:1px solid #2b2118;background:#2b2118;color:#fff;border-radius:10px;cursor:pointer}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="h-left">
-       <img src="logo-niceflatinrome.jpg" alt="NiceFlatInRome" class="brand" style="height:20px;" />
-        <div class="brand">niceflatinrome.com</div>
-      </div>
-      <div class="apt">Apartment: ${apt}</div>
-      <div class="controls">
-        <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔊 Voice: Off</button>
-        <select id="voiceSelect" title="Choose voice"></select>
-      </div>
-    </header>
+<div class="wrap">
+  <header>
+    <div class="h-left">
+      <img src="logo-niceflatinrome.png" alt="NiceFlatInRome" class="brand" />
+      <div class="brand">niceflatinrome.com</div>
+    </div>
+    <div class="apt">Apartment: ${apt}</div>
 
-    <main id="chat" aria-live="polite"></main>
+    <div class="controls">
+      <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔇 Voice: Off</button>
+      <select id="voiceSelect" title="Choose voice"></select>
+      <select id="langSelect" title="Language">
+        <option value="auto">Auto (match reply)</option>
+        <option value="en-US" selected>English</option>
+        <option value="it-IT">Italiano</option>
+        <option value="es-ES">Español</option>
+        <option value="fr-FR">Français</option>
+        <option value="de-DE">Deutsch</option>
+      </select>
+    </div>
+  </header>
 
-    <footer>
-      <input id="input" placeholder="Type a message… e.g., wifi, water, TV" autocomplete="off">
-      <button id="sendBtn">Send</button>
-    </footer>
-  </div>
+  <main id="chat" aria-live="polite"></main>
+
+  <footer>
+    <input id="input" placeholder="Type a message… e.g., wifi, water, TV" autocomplete="off">
+    <button id="sendBtn">Send</button>
+  </footer>
+</div>
 
 <script>
-  const aptId  = new URLSearchParams(location.search).get('apt') || '${apt}';
-  const chatEl = document.getElementById('chat');
-  const input  = document.getElementById('input');
+  // --- DOM
+  const aptId   = new URLSearchParams(location.search).get('apt') || '${apt}';
+  const chatEl  = document.getElementById('chat');
+  const input   = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
+  const voiceBtn    = document.getElementById('voiceBtn');
+  const voiceSelect = document.getElementById('voiceSelect');
+  const langSelect  = document.getElementById('langSelect');
 
-  // --- Voice (TTS) with iOS warm-up + selectable voice ---
+  // --- Voice state
   let voiceOn = false;
   let voices = [];
   let pickedVoice = null;
+  let ttsLang = localStorage.getItem('ttsLang') || 'en-US'; // default English
+  langSelect.value = ttsLang;
 
-  const voiceBtn = document.getElementById('voiceBtn');
-  const voiceSelect = document.getElementById('voiceSelect');
+  function detectLangFromText(t){
+    const s = (t||'').toLowerCase();
+    if (/\b(il|la|che|per|non|grazie|arrivederci)\b/.test(s) || /[àèéìòù]/.test(s)) return 'it-IT';
+    if (/\b(el|la|que|para|gracias|hola)\b/.test(s)) return 'es-ES';
+    if (/\b(le|la|que|pour|merci|bonjour)\b/.test(s)) return 'fr-FR';
+    if (/\b(der|die|das|und|danke|hallo)\b/.test(s)) return 'de-DE';
+    return 'en-US';
+  }
 
   function populateSelect(){
-    const sorted = [...voices].sort((a,b)=>{
-      const ae = /en-/i.test(a.lang), be = /en-/i.test(b.lang);
-      if (ae && !be) return -1;
-      if (!ae && be) return 1;
-      return (a.name||'').localeCompare(b.name||'');
-    });
+    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
     voiceSelect.innerHTML = '';
+
+    const sorted = [...voices].sort((a,b)=> (a.name||'').localeCompare(b.name||''));
     for (const v of sorted){
       const opt = document.createElement('option');
       opt.value = v.name;
       opt.textContent = \`\${v.name} (\${v.lang})\`;
       voiceSelect.appendChild(opt);
     }
-    const saved = localStorage.getItem('voiceName');
-    if (saved && [...voiceSelect.options].some(o=>o.value===saved)){
-      voiceSelect.value = saved;
-      pickedVoice = voices.find(v=>v.name===saved) || null;
-    } else {
-      pickedVoice =
-        voices.find(v => /en-(US|GB)/i.test(v.lang) && /siri|premium|enhanced/i.test(v.name)) ||
-        voices.find(v => /en-(US|GB)/i.test(v.lang)) ||
-        voices[0] || null;
-      if (pickedVoice) voiceSelect.value = pickedVoice.name;
-    }
+
+    const savedName = localStorage.getItem('voiceName');
+
+    // 1) se lingua non "auto", prova voce che matcha la lingua scelta
+    const langPrefix = (ttsLang||'').split('-')[0].toLowerCase();
+    const matchLang = (v) => ttsLang !== 'auto' && v.lang && v.lang.toLowerCase().startsWith(langPrefix);
+
+    pickedVoice =
+      (ttsLang !== 'auto' && voices.find(matchLang)) ||
+      (savedName && voices.find(v => v.name === savedName)) ||
+      voices.find(v => /en-(us|gb)/i.test(v.lang)) || // fallback EN
+      voices[0] || null;
+
+    if (pickedVoice) voiceSelect.value = pickedVoice.name;
   }
 
-  function loadVoices(){
-    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
-    populateSelect();
-  }
   if ('speechSynthesis' in window){
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    populateSelect();
+    window.speechSynthesis.onvoiceschanged = populateSelect;
   }
 
   function warmUpSpeak(){
     try{
       const u = new SpeechSynthesisUtterance('Voice enabled.');
       if (pickedVoice) u.voice = pickedVoice;
-      u.lang = pickedVoice?.lang || 'en-US';
+      u.lang = (ttsLang !== 'auto') ? ttsLang : (pickedVoice?.lang || 'en-US');
       u.rate = 1; u.pitch = 1; u.volume = 1;
       const resumeHack = setInterval(()=>{
         if (speechSynthesis.speaking) speechSynthesis.resume(); else clearInterval(resumeHack);
@@ -226,13 +225,15 @@ app.get('/', (req, res) => {
     try{
       const u = new SpeechSynthesisUtterance(text);
       if (pickedVoice) u.voice = pickedVoice;
-      u.lang = pickedVoice?.lang || 'en-US';
+      const autoLang = detectLangFromText(text);
+      u.lang = (ttsLang !== 'auto') ? ttsLang : (pickedVoice?.lang || autoLang || 'en-US');
       u.rate = 1; u.pitch = 1; u.volume = 1;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     }catch(e){ console.warn('TTS error', e); }
   }
 
+  // UI events
   voiceBtn.addEventListener('click', () => {
     voiceOn = !voiceOn;
     voiceBtn.setAttribute('aria-pressed', String(voiceOn));
@@ -242,11 +243,17 @@ app.get('/', (req, res) => {
 
   voiceSelect.addEventListener('change', () => {
     const name = voiceSelect.value;
-    pickedVoice = voices.find(v=>v.name===name) || null;
+    pickedVoice = voices.find(v => v.name === name) || null;
     localStorage.setItem('voiceName', name);
   });
 
-  // --- UI helpers ---
+  langSelect.addEventListener('change', () => {
+    ttsLang = langSelect.value;               // 'auto' | 'en-US' | 'it-IT' | ...
+    localStorage.setItem('ttsLang', ttsLang);
+    populateSelect();                         // ricalcola voce preferita per la nuova lingua
+  });
+
+  // Chat helpers
   function add(type, txt){
     const d = document.createElement('div');
     d.className = 'msg ' + (type === 'me' ? 'me' : 'wd');
@@ -256,14 +263,14 @@ app.get('/', (req, res) => {
   }
 
   function renderWelcome(){
-    add('wd', 'Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport. (Multilingual)');
+    add('wd','Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport. (Multilingual)');
     const q = document.createElement('div');
     q.className = 'quick';
     const items = ${JSON.stringify(quickButtons)};
     for (const it of items){
       const b = document.createElement('button');
       b.textContent = it;
-      b.addEventListener('click', () => { input.value = it; send(); });
+      b.addEventListener('click', ()=>{ input.value = it; send(); });
       q.appendChild(b);
     }
     chatEl.appendChild(q);
@@ -275,27 +282,28 @@ app.get('/', (req, res) => {
     add('me', text);
     input.value = '';
     try{
-      const r = await fetch('/api/message', {
-        method: 'POST',
-        headers: { 'Content-Type':'application/json' },
-        body: JSON.stringify({ message: text, aptId })
+      const r = await fetch('/api/message',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message:text, aptId })
       });
       const data = await r.json();
       const botText = data.text || 'Sorry, something went wrong.';
       add('wd', botText);
       speak(botText);
     }catch(e){
-      add('wd', 'Network error. Please try again.');
+      add('wd','Network error. Please try again.');
     }
   }
 
-  document.getElementById('sendBtn').addEventListener('click', send);
-  document.getElementById('input').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  sendBtn.addEventListener('click', send);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
 
   renderWelcome();
 </script>
 </body></html>`;
-  res.setHeader('content-type', 'text/html; charset=utf-8');
+
+  res.setHeader('content-type','text/html; charset=utf-8');
   res.end(html);
 });
 
