@@ -7,7 +7,8 @@ import OpenAI from 'openai';
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+// serve i file statici dalla cartella corrente (dove c'è il logo)
+app.use(express.static('.'));
 const apartments = JSON.parse(fs.readFileSync('./apartments.json', 'utf-8'));
 const faqs = JSON.parse(fs.readFileSync('./faqs.json', 'utf-8'));
 
