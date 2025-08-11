@@ -20,7 +20,7 @@ function normalize(s) {
   if (!s) return '';
   return s
     .toLowerCase()
-    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // tutti i trattini strani -> '-'
+    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // trattini strani -> '-'
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -31,8 +31,7 @@ function detectIntent(message) {
   for (const f of faqs) {
     let score = 0;
     for (const u of f.utterances) {
-      if (!u) continue;
-      if (text.includes(normalize(u))) score++;
+      if (u && text.includes(normalize(u))) score++;
     }
     if (score > bestScore) { best = f; bestScore = score; }
   }
@@ -101,6 +100,8 @@ app.get('/', (req, res) => {
   header{position:sticky;top:0;background:#fff;padding:12px 16px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:12px}
   .brand{font-weight:700;color:#a33}
   .apt{margin-left:auto;font-size:14px;opacity:.8}
+  #voiceBtn{margin-left:8px;padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
+  #voiceBtn[aria-pressed="true"]{background:#2b2118;color:#fff;border-color:#2b2118}
   main{flex:1;padding:12px}
   .msg{max-width:85%;line-height:1.35;border-radius:12px;padding:10px 12px;margin:8px 0;white-space:pre-wrap}
   .msg.wd{background:#fff;border:1px solid #e0e0e0}
@@ -117,6 +118,7 @@ app.get('/', (req, res) => {
     <header>
       <div class="brand">niceflatinrome.com</div>
       <div class="apt">Apartment: ${apt}</div>
+      <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔊 Voice: Off</button>
     </header>
     <main id="chat" aria-live="polite"></main>
     <footer>
@@ -130,6 +132,29 @@ app.get('/', (req, res) => {
   const input = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
 
+  // --- Voice (Text-to-Speech, default: English) ---
+  let voiceOn = false;
+  const voiceBtn = document.getElementById('voiceBtn');
+  voiceBtn.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    voiceBtn.setAttribute('aria-pressed', String(voiceOn));
+    voiceBtn.textContent = voiceOn ? '🔊 Voice: On' : '🔇 Voice: Off';
+    // sblocca l'audio su iOS al primo click
+    try { window.speechSynthesis.cancel(); } catch(e){}
+  });
+
+  function speak(text){
+    if (!voiceOn || !('speechSynthesis' in window)) return;
+    try{
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';   // lingua di default English
+      u.rate = 1; u.pitch = 1; u.volume = 1;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }catch(e){ console.warn('TTS error', e); }
+  }
+
+  // --- UI helpers ---
   function add(type, txt){
     const d = document.createElement('div');
     d.className = 'msg ' + (type === 'me' ? 'me' : 'wd');
@@ -164,7 +189,9 @@ app.get('/', (req, res) => {
         body: JSON.stringify({ message: text, aptId })
       });
       const data = await r.json();
-      add('wd', data.text || 'Sorry, something went wrong.');
+      const botText = data.text || 'Sorry, something went wrong.';
+      add('wd', botText);
+      speak(botText); // parla la risposta del bot
     }catch(e){
       add('wd', 'Network error. Please try again.');
     }
