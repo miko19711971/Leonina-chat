@@ -18,9 +18,8 @@ const client = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 // --- Helpers ---
 function normalize(s) {
   if (!s) return '';
-  return s
-    .toLowerCase()
-    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // trattini strani -> '-'
+  return s.toLowerCase()
+    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // vari trattini -> '-'
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -132,27 +131,57 @@ app.get('/', (req, res) => {
   const input = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
 
-  // --- Voice (Text-to-Speech, default: English) ---
+  // --- Voice (TTS) with iOS warm-up + voice selection ---
   let voiceOn = false;
-  const voiceBtn = document.getElementById('voiceBtn');
-  voiceBtn.addEventListener('click', () => {
-    voiceOn = !voiceOn;
-    voiceBtn.setAttribute('aria-pressed', String(voiceOn));
-    voiceBtn.textContent = voiceOn ? '🔊 Voice: On' : '🔇 Voice: Off';
-    // sblocca l'audio su iOS al primo click
-    try { window.speechSynthesis.cancel(); } catch(e){}
-  });
+  let voices = [];
+  let pickedVoice = null;
+
+  function loadVoices(){
+    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
+    pickedVoice =
+      voices.find(v => /en-(US|GB)/i.test(v.lang) && /siri|premium|enhanced/i.test(v.name)) ||
+      voices.find(v => /en-(US|GB)/i.test(v.lang)) ||
+      null;
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function warmUpSpeak(){
+    try{
+      const u = new SpeechSynthesisUtterance('Voice enabled.');
+      if (pickedVoice) u.voice = pickedVoice;
+      u.lang = pickedVoice?.lang || 'en-US';
+      u.rate = 1; u.pitch = 1; u.volume = 1;
+      const resumeHack = setInterval(() => {
+        if (speechSynthesis.speaking) speechSynthesis.resume();
+        else clearInterval(resumeHack);
+      }, 200);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    }catch(e){ console.warn('Warm-up error', e); }
+  }
 
   function speak(text){
     if (!voiceOn || !('speechSynthesis' in window)) return;
     try{
       const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';   // lingua di default English
+      if (pickedVoice) u.voice = pickedVoice;
+      u.lang = pickedVoice?.lang || 'en-US';
       u.rate = 1; u.pitch = 1; u.volume = 1;
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     }catch(e){ console.warn('TTS error', e); }
   }
+
+  const voiceBtn = document.getElementById('voiceBtn');
+  voiceBtn.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    voiceBtn.setAttribute('aria-pressed', String(voiceOn));
+    voiceBtn.textContent = voiceOn ? '🔊 Voice: On' : '🔇 Voice: Off';
+    if (voiceOn) warmUpSpeak(); // sblocca audio iOS al primo ON
+  });
 
   // --- UI helpers ---
   function add(type, txt){
