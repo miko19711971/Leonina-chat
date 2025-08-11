@@ -7,8 +7,10 @@ import OpenAI from 'openai';
 const app = express();
 app.use(cors());
 app.use(express.json());
-// serve i file statici dalla cartella corrente (dove c'è il logo)
+
+// serve file statici dalla cartella corrente (logo, ecc.)
 app.use(express.static('.'));
+
 const apartments = JSON.parse(fs.readFileSync('./apartments.json', 'utf-8'));
 const faqs = JSON.parse(fs.readFileSync('./faqs.json', 'utf-8'));
 
@@ -97,38 +99,64 @@ app.get('/', (req, res) => {
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f6f6}
   .wrap{max-width:760px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-  header{position:sticky;top:0;background:#fff;padding:12px 16px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .brand{font-weight:700;color:#a33}
-  .apt{margin-left:auto;font-size:14px;opacity:.8}
-  #voiceBtn{padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
+
+  /* HEADER */
+  header{
+    position:sticky;top:0;z-index:10;background:#fff;
+    padding:10px 14px;border-bottom:1px solid #eaeaea;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap
+  }
+  .h-left{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand{font-weight:700;color:#a33;white-space:nowrap}
+  .brand img{height:40px;width:auto;display:block}
+  .apt{margin-left:auto;font-size:14px;opacity:.85;white-space:nowrap}
+  .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  #voiceBtn{
+    padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;
+    cursor:pointer;font-size:14px
+  }
   #voiceBtn[aria-pressed="true"]{background:#2b2118;color:#fff;border-color:#2b2118}
   #voiceSelect{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:14px;max-width:240px}
+
   main{flex:1;padding:12px}
-  .msg{max-width:85%;line-height:1.35;border-radius:12px;padding:10px 12px;margin:8px 0;white-space:pre-wrap}
-  .msg.wd{background:#fff;border:1px solid #e0e0e0}
-  .msg.me{background:#e8f0fe;border:1px solid #c5d5ff;margin-left:auto}
+  .msg{max-width:85%;line-height:1.4;border-radius:12px;padding:12px 14px;margin:8px 0;white-space:pre-wrap}
+  .msg.wd{background:#fff;border:1px solid #e6e6e6}
+  .msg.me{background:#eaf2ff;border:1px solid #cddfff;margin-left:auto}
+
   .quick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .quick button{border:1px solid #d6c5b8;background:#fff;color:#333;padding:6px 10px;border-radius:12px;cursor:pointer}
-  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #e0e0e0}
-  input{flex:1;padding:12px;border:1px solid #cbd5e1;border-radius:10px;outline:none}
-  #sendBtn{padding:12px 14px;border:1px solid #2b2118;background:#2b2118;color:#fff;border-radius:10px;cursor:pointer}
+  .quick button{
+    border:1px solid #d6c5b8;background:#fff;color:#333;padding:8px 12px;
+    border-radius:14px;cursor:pointer;line-height:1;height:36px
+  }
+  .quick button:active{transform:translateY(1px)}
+
+  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #eaeaea}
+  input{flex:1;padding:14px;border:1px solid #cbd5e1;border-radius:10px;outline:none}
+  #sendBtn{padding:14px;border:1px solid #2b2118;background:#2b2118;color:#fff;border-radius:10px;cursor:pointer}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <img src="logo-niceflatinrome.png" alt="NiceFlatInRome" style="height:40px; vertical-align:middle; margin-right:8px;">
-      <div class="brand">niceflatinrome.com</div>
+      <div class="h-left">
+        <img src="/logo-niceflatinrome.png" alt="NiceFlatInRome" class="brand" />
+        <div class="brand">niceflatinrome.com</div>
+      </div>
       <div class="apt">Apartment: ${apt}</div>
-      <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔊 Voice: Off</button>
-      <select id="voiceSelect" title="Choose voice"></select>
+      <div class="controls">
+        <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔊 Voice: Off</button>
+        <select id="voiceSelect" title="Choose voice"></select>
+      </div>
     </header>
+
     <main id="chat" aria-live="polite"></main>
+
     <footer>
       <input id="input" placeholder="Type a message… e.g., wifi, water, TV" autocomplete="off">
       <button id="sendBtn">Send</button>
     </footer>
   </div>
+
 <script>
   const aptId  = new URLSearchParams(location.search).get('apt') || '${apt}';
   const chatEl = document.getElementById('chat');
@@ -261,8 +289,8 @@ app.get('/', (req, res) => {
     }
   }
 
-  sendBtn.addEventListener('click', send);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  document.getElementById('sendBtn').addEventListener('click', send);
+  document.getElementById('input').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
 
   renderWelcome();
 </script>
