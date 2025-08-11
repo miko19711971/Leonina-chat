@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// serve file statici (logo ecc.)
+// serve file statici (logo ecc.) dalla root del repo
 app.use(express.static('.'));
 
 const apartments = JSON.parse(fs.readFileSync('./apartments.json', 'utf-8'));
@@ -83,38 +83,6 @@ app.post('/api/message', async (req, res) => {
   res.json({ text, intent: matched?.intent || null });
 });
 
-// --- API: translate for TTS ---
-const LANG_NAME = {
-  'en-US': 'English',
-  'it-IT': 'Italian',
-  'es-ES': 'Spanish',
-  'fr-FR': 'French',
-  'de-DE': 'German',
-};
-
-app.post('/api/translate', async (req, res) => {
-  const { text, targetLang = 'en-US' } = req.body || {};
-  if (!text || typeof text !== 'string') return res.status(400).json({ error: 'Missing text' });
-  const langName = LANG_NAME[targetLang] || 'English';
-
-  // Fallback: no API → return original text
-  if (!client) return res.json({ text });
-
-  try{
-    const instructions = `Translate the user's text into ${langName}. Preserve meaning, tone and formatting. Keep it concise, no preamble, no quotes.`;
-    const resp = await client.responses.create({
-      model: OPENAI_MODEL,
-      instructions,
-      input: [{ role: 'user', content: text }]
-    });
-    const out = resp.output_text?.trim() || text;
-    res.json({ text: out });
-  }catch(e){
-    console.error('translate error', e);
-    res.json({ text }); // fallback on error
-  }
-});
-
 // --- UI (single-file HTML+JS) ---
 app.get('/', (req, res) => {
   const apt = (req.query.apt || 'LEONINA71').toString();
@@ -131,142 +99,113 @@ app.get('/', (req, res) => {
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f6f6}
   .wrap{max-width:760px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
-  header{position:sticky;top:0;background:#fff;padding:10px 14px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .h-left{display:flex;align-items:center;gap:8px}
-  .brand{font-weight:700;color:#a33}
-  img.brand{height:40px}
-  .apt{margin-left:auto;font-size:14px;opacity:.85}
-  .controls{display:flex;gap:8px;width:100%}
-  #voiceBtn{padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
+
+  /* HEADER */
+  header{
+    position:sticky;top:0;z-index:10;background:#fff;
+    padding:10px 14px;border-bottom:1px solid #eaeaea;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap
+  }
+  .h-left{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand{font-weight:700;color:#a33;white-space:nowrap}
+  .apt{margin-left:auto;font-size:14px;opacity:.85;white-space:nowrap}
+  #voiceBtn{
+    padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;
+    cursor:pointer;font-size:14px
+  }
   #voiceBtn[aria-pressed="true"]{background:#2b2118;color:#fff;border-color:#2b2118}
-  select{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:14px}
+
   main{flex:1;padding:12px}
-  .msg{max-width:85%;line-height:1.35;border-radius:12px;padding:10px 12px;margin:8px 0;white-space:pre-wrap}
-  .msg.wd{background:#fff;border:1px solid #e0e0e0}
-  .msg.me{background:#e8f0fe;border:1px solid #c5d5ff;margin-left:auto}
+  .msg{max-width:85%;line-height:1.4;border-radius:12px;padding:12px 14px;margin:8px 0;white-space:pre-wrap}
+  .msg.wd{background:#fff;border:1px solid #e6e6e6}
+  .msg.me{background:#eaf2ff;border:1px solid #cddfff;margin-left:auto}
+
   .quick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-  .quick button{border:1px solid #d6c5b8;background:#fff;color:#333;padding:8px 12px;border-radius:12px;cursor:pointer;line-height:1;height:36px}
+  .quick button{
+    border:1px solid #d6c5b8;background:#fff;color:#333;padding:8px 12px;
+    border-radius:14px;cursor:pointer;line-height:1;height:36px
+  }
   .quick button:active{transform:translateY(1px)}
-  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #e0e0e0}
+
+  footer{position:sticky;bottom:0;background:#fff;display:flex;gap:8px;padding:10px;border-top:1px solid #eaeaea}
   input{flex:1;padding:14px;border:1px solid #cbd5e1;border-radius:10px;outline:none}
   #sendBtn{padding:14px;border:1px solid #2b2118;background:#2b2118;color:#fff;border-radius:10px;cursor:pointer}
+
+  /* Logo size */
+  .logo{height:24px;width:auto;display:block}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="h-left">
-      <img src="logo-niceflatinrome.png" alt="NiceFlatInRome" class="brand" />
-      <div class="brand">niceflatinrome.com</div>
-    </div>
-    <div class="apt">Apartment: ${apt}</div>
-
-    <div class="controls">
+  <div class="wrap">
+    <header>
+      <div class="h-left">
+        <img id="logo" class="logo" src="/logo-niceflatinrome.png" alt="NiceFlatInRome">
+        <div class="brand">niceflatinrome.com</div>
+      </div>
+      <div class="apt">Apartment: ${apt}</div>
       <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔇 Voice: Off</button>
-      <select id="voiceSelect" title="Voice"></select>
-      <select id="langSelect" title="Language">
-        <option value="en-US" selected>English</option>
-        <option value="it-IT">Italiano</option>
-        <option value="es-ES">Español</option>
-        <option value="fr-FR">Français</option>
-        <option value="de-DE">Deutsch</option>
-      </select>
-    </div>
-  </header>
+    </header>
 
-  <main id="chat" aria-live="polite"></main>
+    <main id="chat" aria-live="polite"></main>
 
-  <footer>
-    <input id="input" placeholder="Type a message… e.g., wifi, water, TV" autocomplete="off">
-    <button id="sendBtn">Send</button>
-  </footer>
-</div>
+    <footer>
+      <input id="input" placeholder="Type a message… e.g., wifi, water, TV" autocomplete="off">
+      <button id="sendBtn">Send</button>
+    </footer>
+  </div>
 
 <script>
-  // --- DOM
   const aptId   = new URLSearchParams(location.search).get('apt') || '${apt}';
   const chatEl  = document.getElementById('chat');
   const input   = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
-  const voiceBtn    = document.getElementById('voiceBtn');
-  const voiceSelect = document.getElementById('voiceSelect');
-  const langSelect  = document.getElementById('langSelect');
 
-  // --- Voice state
+  // --- Fix logo: prova più nomi, altrimenti nascondi ---
+  (function(){
+    const img = document.getElementById('logo');
+    const candidates = ['/logo-niceflatinrome.png','/logo-niceflatinrome.jpg','/logo.png','/logo.jpg'];
+    let idx = 0;
+    img.onerror = () => {
+      idx++;
+      if (idx < candidates.length){
+        img.src = candidates[idx];
+      } else {
+        img.style.display = 'none'; // niente punto interrogativo
+      }
+    };
+    img.src = candidates[0];
+  })();
+
+  // --- Voice (Samantha only / English US) ---
   let voiceOn = false;
   let voices = [];
   let pickedVoice = null;
 
-  // preferenze salvate
-  let ttsLang  = localStorage.getItem('ttsLang')  || 'en-US';
-  let ttsGender = localStorage.getItem('ttsGender') || 'female'; // female|male
-  langSelect.value = ttsLang;
-
-  // nomi preferiti (fallback intelligenti)
-  const PREFERRED = {
-    'en-US': { female: ['Samantha','Victoria','Karen'], male: ['Alex','Daniel','Fred'] },
-    'it-IT': { female: ['Alice','Federica'],           male: ['Luca'] },
-    'es-ES': { female: ['Monica','Paulina'],           male: ['Diego','Jorge'] },
-    'fr-FR': { female: ['Amelie','Virginie'],          male: ['Thomas'] },
-    'de-DE': { female: ['Anna','Petra'],               male: ['Markus','Yannick'] }
-  };
-
-  function getCandidatesByLang(lang){
-    const pref = PREFERRED[lang] || { female:[], male:[] };
-    const inLang = (v)=> v.lang && v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]);
-    const pool = voices.filter(inLang);
-
-    function pickByNames(names){
-      for (const n of names){
-        const found = pool.find(v => (v.name||'').toLowerCase().includes(n.toLowerCase()));
-        if (found) return found;
-      }
-      return null;
-    }
-
-    const female = pickByNames(pref.female) || pool[0] || null;
-    const male   = pickByNames(pref.male)   || pool.find(v=>v!==female) || pool[0] || null;
-
-    return { female, male, pool };
+  function chooseSamantha(){
+    // 1) Samantha, 2) qualunque en-US/GB, 3) prima disponibile
+    pickedVoice =
+      voices.find(v => /samantha/i.test(v.name)) ||
+      voices.find(v => /en-(us|gb)/i.test(v.lang)) ||
+      voices[0] || null;
   }
 
-  function populateVoiceSelect(){
+  function loadVoices(){
     voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
-    voiceSelect.innerHTML = '';
-    const cand = getCandidatesByLang(ttsLang);
-
-    const opts = [];
-    if (cand.female) opts.push({key:'female', label:'Female', v:cand.female});
-    if (cand.male)   opts.push({key:'male',   label:'Male',   v:cand.male});
-
-    for (const o of opts){
-      const option = document.createElement('option');
-      option.value = o.key;
-      option.textContent = o.label;
-      voiceSelect.appendChild(option);
-    }
-
-    if (![...voiceSelect.options].some(o=>o.value===ttsGender)){
-      ttsGender = 'female';
-    }
-    voiceSelect.value = ttsGender;
-
-    pickedVoice = (ttsGender === 'male' ? cand.male : cand.female) || cand.pool[0] || null;
-    if (pickedVoice){
-      localStorage.setItem('voiceName', pickedVoice.name || '');
-    }
+    chooseSamantha();
   }
 
   if ('speechSynthesis' in window){
-    populateVoiceSelect();
-    window.speechSynthesis.onvoiceschanged = populateVoiceSelect;
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = () => { loadVoices(); };
   }
+
+  const voiceBtn = document.getElementById('voiceBtn');
 
   function warmUpSpeak(){
     try{
       const u = new SpeechSynthesisUtterance('Voice enabled.');
       if (pickedVoice) u.voice = pickedVoice;
-      u.lang = pickedVoice?.lang || ttsLang;
+      u.lang = 'en-US';
       u.rate = 1; u.pitch = 1; u.volume = 1;
       const resumeHack = setInterval(()=>{
         if (speechSynthesis.speaking) speechSynthesis.resume(); else clearInterval(resumeHack);
@@ -276,55 +215,18 @@ app.get('/', (req, res) => {
     }catch(e){ console.warn('Warm-up error', e); }
   }
 
-  // --- Translate then speak ---
-  async function translateForTTS(text){
-    // semplice euristica: se lingua del testo già combacia con ttsLang, niente traduzione
-    const s = (text||'').toLowerCase();
-    const langPrefix = ttsLang.split('-')[0];
-    const looksIT = /[àèéìòù]/.test(s) || /\b(il|la|che|per|grazie|ciao)\b/.test(s);
-    const looksES = /\b(el|la|que|para|gracias|hola)\b/.test(s);
-    const looksFR = /\b(le|la|que|pour|merci|bonjour)\b/.test(s);
-    const looksDE = /\b(der|die|das|und|danke|hallo)\b/.test(s);
-    const detected =
-      looksIT ? 'it' :
-      looksES ? 'es' :
-      looksFR ? 'fr' :
-      looksDE ? 'de' : 'en';
-
-    if ((detected === 'it' && langPrefix === 'it') ||
-        (detected === 'es' && langPrefix === 'es') ||
-        (detected === 'fr' && langPrefix === 'fr') ||
-        (detected === 'de' && langPrefix === 'de') ||
-        (detected === 'en' && (langPrefix === 'en')))
-      return text;
-
-    try{
-      const r = await fetch('/api/translate', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ text, targetLang: ttsLang })
-      });
-      const data = await r.json();
-      return data.text || text;
-    }catch(e){
-      console.warn('translate failed', e);
-      return text; // fallback
-    }
-  }
-
   function speak(text){
     if (!voiceOn || !('speechSynthesis' in window)) return;
     try{
       const u = new SpeechSynthesisUtterance(text);
       if (pickedVoice) u.voice = pickedVoice;
-      u.lang = pickedVoice?.lang || ttsLang;
+      u.lang = 'en-US'; // fisso
       u.rate = 1; u.pitch = 1; u.volume = 1;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     }catch(e){ console.warn('TTS error', e); }
   }
 
-  // UI events
   voiceBtn.addEventListener('click', () => {
     voiceOn = !voiceOn;
     voiceBtn.setAttribute('aria-pressed', String(voiceOn));
@@ -332,23 +234,7 @@ app.get('/', (req, res) => {
     if (voiceOn) warmUpSpeak();
   });
 
-  voiceSelect.addEventListener('change', () => {
-    const val = voiceSelect.value; // female|male
-    localStorage.setItem('ttsGender', val);
-    // ricostruisci per aggiornare pickedVoice
-    const saved = ttsLang; // conserva
-    ttsGender = val;
-    populateVoiceSelect();
-    ttsLang = saved;
-  });
-
-  langSelect.addEventListener('change', () => {
-    ttsLang = langSelect.value;          // en-US | it-IT | es-ES | fr-FR | de-DE
-    localStorage.setItem('ttsLang', ttsLang);
-    populateVoiceSelect();
-  });
-
-  // Chat helpers
+  // --- Chat UI ---
   function add(type, txt){
     const d = document.createElement('div');
     d.className = 'msg ' + (type === 'me' ? 'me' : 'wd');
@@ -358,14 +244,14 @@ app.get('/', (req, res) => {
   }
 
   function renderWelcome(){
-    add('wd','Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport. (Multilingual)');
+    add('wd', 'Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport.');
     const q = document.createElement('div');
     q.className = 'quick';
     const items = ${JSON.stringify(quickButtons)};
     for (const it of items){
       const b = document.createElement('button');
       b.textContent = it;
-      b.addEventListener('click', ()=>{ input.value = it; send(); });
+      b.addEventListener('click', () => { input.value = it; send(); });
       q.appendChild(b);
     }
     chatEl.appendChild(q);
@@ -385,10 +271,7 @@ app.get('/', (req, res) => {
       const data = await r.json();
       const botText = data.text || 'Sorry, something went wrong.';
       add('wd', botText);
-
-      // TRADUCI PRIMA, POI PARLA
-      const speakText = await translateForTTS(botText);
-      speak(speakText);
+      speak(botText);
     }catch(e){
       add('wd','Network error. Please try again.');
     }
