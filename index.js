@@ -8,6 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// serve file statici (logo ecc.)
+app.use(express.static('.'));
+
 const apartments = JSON.parse(fs.readFileSync('./apartments.json', 'utf-8'));
 const faqs       = JSON.parse(fs.readFileSync('./faqs.json', 'utf-8'));
 
@@ -65,7 +68,7 @@ async function polish(raw, userMessage, apt){
   }
 }
 
-// --- API ---
+// --- API: main message ---
 app.post('/api/message', async (req, res) => {
   const { message, aptId = 'LEONINA71' } = req.body || {};
   if (!apartments[aptId]) return res.status(400).json({ error: 'Invalid aptId' });
@@ -78,6 +81,38 @@ app.post('/api/message', async (req, res) => {
 
   const text = await polish(raw, message, apt);
   res.json({ text, intent: matched?.intent || null });
+});
+
+// --- API: translate for TTS ---
+const LANG_NAME = {
+  'en-US': 'English',
+  'it-IT': 'Italian',
+  'es-ES': 'Spanish',
+  'fr-FR': 'French',
+  'de-DE': 'German',
+};
+
+app.post('/api/translate', async (req, res) => {
+  const { text, targetLang = 'en-US' } = req.body || {};
+  if (!text || typeof text !== 'string') return res.status(400).json({ error: 'Missing text' });
+  const langName = LANG_NAME[targetLang] || 'English';
+
+  // Fallback: no API → return original text
+  if (!client) return res.json({ text });
+
+  try{
+    const instructions = `Translate the user's text into ${langName}. Preserve meaning, tone and formatting. Keep it concise, no preamble, no quotes.`;
+    const resp = await client.responses.create({
+      model: OPENAI_MODEL,
+      instructions,
+      input: [{ role: 'user', content: text }]
+    });
+    const out = resp.output_text?.trim() || text;
+    res.json({ text: out });
+  }catch(e){
+    console.error('translate error', e);
+    res.json({ text }); // fallback on error
+  }
 });
 
 // --- UI (single-file HTML+JS) ---
@@ -167,7 +202,7 @@ app.get('/', (req, res) => {
   let ttsGender = localStorage.getItem('ttsGender') || 'female'; // female|male
   langSelect.value = ttsLang;
 
-  // **mapping** di nomi voce comuni per piattaforma (fallback se non presenti)
+  // nomi preferiti (fallback intelligenti)
   const PREFERRED = {
     'en-US': { female: ['Samantha','Victoria','Karen'], male: ['Alex','Daniel','Fred'] },
     'it-IT': { female: ['Alice','Federica'],           male: ['Luca'] },
@@ -196,7 +231,7 @@ app.get('/', (req, res) => {
   }
 
   function populateVoiceSelect(){
-    // mostra SOLO Female/Male per la lingua scelta
+    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
     voiceSelect.innerHTML = '';
     const cand = getCandidatesByLang(ttsLang);
 
@@ -211,27 +246,20 @@ app.get('/', (req, res) => {
       voiceSelect.appendChild(option);
     }
 
-    // seleziona gender salvato se presente
     if (![...voiceSelect.options].some(o=>o.value===ttsGender)){
       ttsGender = 'female';
     }
     voiceSelect.value = ttsGender;
 
-    // set pickedVoice coerente
     pickedVoice = (ttsGender === 'male' ? cand.male : cand.female) || cand.pool[0] || null;
     if (pickedVoice){
       localStorage.setItem('voiceName', pickedVoice.name || '');
     }
   }
 
-  function loadVoices(){
-    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
-    populateVoiceSelect();
-  }
-
   if ('speechSynthesis' in window){
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    populateVoiceSelect();
+    window.speechSynthesis.onvoiceschanged = populateVoiceSelect;
   }
 
   function warmUpSpeak(){
@@ -246,6 +274,42 @@ app.get('/', (req, res) => {
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     }catch(e){ console.warn('Warm-up error', e); }
+  }
+
+  // --- Translate then speak ---
+  async function translateForTTS(text){
+    // semplice euristica: se lingua del testo già combacia con ttsLang, niente traduzione
+    const s = (text||'').toLowerCase();
+    const langPrefix = ttsLang.split('-')[0];
+    const looksIT = /[àèéìòù]/.test(s) || /\b(il|la|che|per|grazie|ciao)\b/.test(s);
+    const looksES = /\b(el|la|que|para|gracias|hola)\b/.test(s);
+    const looksFR = /\b(le|la|que|pour|merci|bonjour)\b/.test(s);
+    const looksDE = /\b(der|die|das|und|danke|hallo)\b/.test(s);
+    const detected =
+      looksIT ? 'it' :
+      looksES ? 'es' :
+      looksFR ? 'fr' :
+      looksDE ? 'de' : 'en';
+
+    if ((detected === 'it' && langPrefix === 'it') ||
+        (detected === 'es' && langPrefix === 'es') ||
+        (detected === 'fr' && langPrefix === 'fr') ||
+        (detected === 'de' && langPrefix === 'de') ||
+        (detected === 'en' && (langPrefix === 'en')))
+      return text;
+
+    try{
+      const r = await fetch('/api/translate', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ text, targetLang: ttsLang })
+      });
+      const data = await r.json();
+      return data.text || text;
+    }catch(e){
+      console.warn('translate failed', e);
+      return text; // fallback
+    }
   }
 
   function speak(text){
@@ -269,15 +333,19 @@ app.get('/', (req, res) => {
   });
 
   voiceSelect.addEventListener('change', () => {
-    ttsGender = voiceSelect.value; // female|male
-    localStorage.setItem('ttsGender', ttsGender);
-    populateVoiceSelect(); // riallinea pickedVoice
+    const val = voiceSelect.value; // female|male
+    localStorage.setItem('ttsGender', val);
+    // ricostruisci per aggiornare pickedVoice
+    const saved = ttsLang; // conserva
+    ttsGender = val;
+    populateVoiceSelect();
+    ttsLang = saved;
   });
 
   langSelect.addEventListener('change', () => {
     ttsLang = langSelect.value;          // en-US | it-IT | es-ES | fr-FR | de-DE
     localStorage.setItem('ttsLang', ttsLang);
-    populateVoiceSelect();               // ricalcola le 2 opzioni per la lingua
+    populateVoiceSelect();
   });
 
   // Chat helpers
@@ -317,7 +385,10 @@ app.get('/', (req, res) => {
       const data = await r.json();
       const botText = data.text || 'Sorry, something went wrong.';
       add('wd', botText);
-      speak(botText);
+
+      // TRADUCI PRIMA, POI PARLA
+      const speakText = await translateForTTS(botText);
+      speak(speakText);
     }catch(e){
       add('wd','Network error. Please try again.');
     }
