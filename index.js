@@ -139,7 +139,7 @@ app.get('/', (req, res) => {
   <div class="wrap">
     <header>
       <div class="h-left">
-        <img src="/logo-niceflatinrome.png" alt="NiceFlatInRome" class="brand" />
+        <img src="/logo-niceflatinrome.jpg" alt="NiceFlatInRome" class="brand" />
         <div class="brand">niceflatinrome.com</div>
       </div>
       <div class="apt">Apartment: ${apt}</div>
