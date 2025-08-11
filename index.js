@@ -20,9 +20,7 @@ function normalize(s) {
   if (!s) return '';
   return s
     .toLowerCase()
-    // normalizza vari tipi di trattini (– — - ecc.) in trattino semplice
-    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-')
-    // comprime spazi multipli
+    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // tutti i trattini strani -> '-'
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -33,8 +31,8 @@ function detectIntent(message) {
   for (const f of faqs) {
     let score = 0;
     for (const u of f.utterances) {
-      const uNorm = normalize(u);
-      if (uNorm && text.includes(uNorm)) score++;
+      if (!u) continue;
+      if (text.includes(normalize(u))) score++;
     }
     if (score > bestScore) { best = f; bestScore = score; }
   }
@@ -46,22 +44,21 @@ function fillTemplate(tpl, apt) {
 }
 
 async function polish(raw, userMessage, apt) {
-  if (!client) return raw; // senza chiave API, restituiamo il testo grezzo
+  if (!client) return raw;
   const instructions = [
     'You are a concise multilingual guest assistant for a vacation rental.',
     'Rewrite the provided answer keeping facts identical, no inventions.',
-    'Use the same language as the user, keep under 120 words unless steps are needed.',
-    'If fallback, ask one clarifying question.'
+    'Use the same language as the user, keep under 120 words unless steps are needed.'
   ].join(' ');
   try {
     const resp = await client.responses.create({
       model: OPENAI_MODEL,
+      instructions,
       input: [
-        { role: 'user', content: `User message: [${userMessage || ''}]` },
+        { role: 'user', content: `User message: ${userMessage || ''}` },
         { role: 'developer', content: `Apartment data (JSON): ${JSON.stringify(apt)}` },
         { role: 'system', content: `Raw answer to polish:\n${raw}` }
-      ],
-      instructions
+      ]
     });
     return resp.output_text || raw;
   } catch (e) {
@@ -77,14 +74,15 @@ app.post('/api/message', async (req, res) => {
   const apt = apartments[aptId];
 
   const matched = detectIntent(message);
-  let raw =
-    matched ? fillTemplate(matched.answer_template, apt)
-            : 'I did not find a direct answer. Try: wifi, water, TV, trash, check in, check out, restaurants, transport, airport, emergency.';
+  let raw = matched
+    ? fillTemplate(matched.answer_template, apt)
+    : 'I did not find a direct answer. Please rephrase or tap a quick button above.';
+
   const text = await polish(raw, message, apt);
   res.json({ text, intent: matched?.intent || null });
 });
 
-// --- UI (single file HTML con inline JS/CSS) ---
+// --- UI (single file HTML with inline JS/CSS) ---
 app.get('/', (req, res) => {
   const apt = (req.query.apt || 'LEONINA71').toString();
   const quickButtons = [
@@ -101,7 +99,7 @@ app.get('/', (req, res) => {
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f6f6f6}
   .wrap{max-width:760px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
   header{position:sticky;top:0;background:#fff;padding:12px 16px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:12px}
-  .brand{font-weight:700;color:#a33;text-transform:lowercase}
+  .brand{font-weight:700;color:#a33}
   .apt{margin-left:auto;font-size:14px;opacity:.8}
   main{flex:1;padding:12px}
   .msg{max-width:85%;line-height:1.35;border-radius:12px;padding:10px 12px;margin:8px 0;white-space:pre-wrap}
@@ -128,62 +126,42 @@ app.get('/', (req, res) => {
   </div>
 <script>
   const aptId = new URLSearchParams(location.search).get('apt') || '${apt}';
-
-  function add(type, txt){
-    const w = document.getElementById('chat');
-    const d = document.createElement('div');
-    d.className = 'msg ' + (type === 'me' ? 'me' : 'wd');
-    d.textContent = txt;
-    w.appendChild(d);
-    w.scrollTop = w.scrollHeight;
-  }
-
-  function quick(items){
-    const q = document.createElement('div');
-    q.className = 'quick';
-    for(const it of items){
-      const b = document.createElement('button');
-      b.textContent = it;
-      b.addEventListener('click', () => {
-        input.value = it; send();
-      });
-      q.appendChild(b);
-    }
-    return q.outerHTML;
-  }
-
-  // Messaggio di benvenuto + bottoni rapidi
-  const welcome = "Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport. (Multilingual)";
-  document.getElementById('chat').innerHTML =
-    '<div class="msg wd">'+welcome+'</div>' +
-    ${JSON.stringify(quickButtons)}; // placeholder
-
-  // Sostituiamo il placeholder con l'HTML generato
-  (function(){
-    const c = document.getElementById('chat');
-    const tmp = document.createElement('div');
-    tmp.innerHTML = ${JSON.stringify('<div class="quick"></div>')};
-    c.appendChild(tmp.firstChild);
-    document.querySelector('.quick').outerHTML = (function(){
-      const el = document.createElement('div');
-      el.innerHTML = quick(${JSON.stringify(quickButtons)});
-      return el.firstChild.outerHTML;
-    })();
-  })();
-
+  const chatEl = document.getElementById('chat');
   const input = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
 
+  function add(type, txt){
+    const d = document.createElement('div');
+    d.className = 'msg ' + (type === 'me' ? 'me' : 'wd');
+    d.textContent = txt;
+    chatEl.appendChild(d);
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+
+  function renderWelcome(){
+    add('wd', 'Welcome! I can help with Wi-Fi, water, TV, trash, check-in/out, restaurants, transport, airport. (Multilingual)');
+    const q = document.createElement('div');
+    q.className = 'quick';
+    const items = ${JSON.stringify(quickButtons)};
+    for(const it of items){
+      const b = document.createElement('button');
+      b.textContent = it;
+      b.addEventListener('click', () => { input.value = it; send(); });
+      q.appendChild(b);
+    }
+    chatEl.appendChild(q);
+  }
+
   async function send(){
-    const text = input.value.trim();
+    const text = (input.value || '').trim();
     if(!text) return;
     add('me', text);
     input.value = '';
     try{
       const r = await fetch('/api/message', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ message:text, aptId })
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ message: text, aptId })
       });
       const data = await r.json();
       add('wd', data.text || 'Sorry, something went wrong.');
@@ -193,7 +171,9 @@ app.get('/', (req, res) => {
   }
 
   sendBtn.addEventListener('click', send);
-  input.addEventListener('keydown', e => { if(e.key==='Enter') send(); });
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') send(); });
+
+  renderWelcome();
 </script>
 </body></html>`;
   res.setHeader('content-type', 'text/html; charset=utf-8');
