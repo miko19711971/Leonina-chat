@@ -19,7 +19,7 @@ const client = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 function normalize(s){
   if (!s) return '';
   return s.toLowerCase()
-    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-') // varianti di trattino -> '-'
+    .replace(/[\u2010-\u2015\u2212\u2043\u00ad]/g, '-')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -99,9 +99,9 @@ app.get('/', (req, res) => {
   header{position:sticky;top:0;background:#fff;padding:10px 14px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .h-left{display:flex;align-items:center;gap:8px}
   .brand{font-weight:700;color:#a33}
+  img.brand{height:40px}
   .apt{margin-left:auto;font-size:14px;opacity:.85}
   .controls{display:flex;gap:8px;width:100%}
-  img.brand{height:40px}
   #voiceBtn{padding:8px 10px;border:1px solid #ddd;background:#fff;border-radius:10px;cursor:pointer;font-size:14px}
   #voiceBtn[aria-pressed="true"]{background:#2b2118;color:#fff;border-color:#2b2118}
   select{padding:8px 10px;border:1px solid #ddd;border-radius:10px;background:#fff;font-size:14px}
@@ -128,9 +128,8 @@ app.get('/', (req, res) => {
 
     <div class="controls">
       <button id="voiceBtn" aria-pressed="false" title="Toggle voice">🔇 Voice: Off</button>
-      <select id="voiceSelect" title="Choose voice"></select>
+      <select id="voiceSelect" title="Voice"></select>
       <select id="langSelect" title="Language">
-        <option value="auto">Auto (match reply)</option>
         <option value="en-US" selected>English</option>
         <option value="it-IT">Italiano</option>
         <option value="es-ES">Español</option>
@@ -162,55 +161,84 @@ app.get('/', (req, res) => {
   let voiceOn = false;
   let voices = [];
   let pickedVoice = null;
-  let ttsLang = localStorage.getItem('ttsLang') || 'en-US'; // default English
+
+  // preferenze salvate
+  let ttsLang  = localStorage.getItem('ttsLang')  || 'en-US';
+  let ttsGender = localStorage.getItem('ttsGender') || 'female'; // female|male
   langSelect.value = ttsLang;
 
-  function detectLangFromText(t){
-    const s = (t||'').toLowerCase();
-    if (/\b(il|la|che|per|non|grazie|arrivederci)\b/.test(s) || /[àèéìòù]/.test(s)) return 'it-IT';
-    if (/\b(el|la|que|para|gracias|hola)\b/.test(s)) return 'es-ES';
-    if (/\b(le|la|que|pour|merci|bonjour)\b/.test(s)) return 'fr-FR';
-    if (/\b(der|die|das|und|danke|hallo)\b/.test(s)) return 'de-DE';
-    return 'en-US';
-  }
+  // **mapping** di nomi voce comuni per piattaforma (fallback se non presenti)
+  const PREFERRED = {
+    'en-US': { female: ['Samantha','Victoria','Karen'], male: ['Alex','Daniel','Fred'] },
+    'it-IT': { female: ['Alice','Federica'],           male: ['Luca'] },
+    'es-ES': { female: ['Monica','Paulina'],           male: ['Diego','Jorge'] },
+    'fr-FR': { female: ['Amelie','Virginie'],          male: ['Thomas'] },
+    'de-DE': { female: ['Anna','Petra'],               male: ['Markus','Yannick'] }
+  };
 
-  function populateSelect(){
-    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
-    voiceSelect.innerHTML = '';
+  function getCandidatesByLang(lang){
+    const pref = PREFERRED[lang] || { female:[], male:[] };
+    const inLang = (v)=> v.lang && v.lang.toLowerCase().startsWith(lang.toLowerCase().split('-')[0]);
+    const pool = voices.filter(inLang);
 
-    const sorted = [...voices].sort((a,b)=> (a.name||'').localeCompare(b.name||''));
-    for (const v of sorted){
-      const opt = document.createElement('option');
-      opt.value = v.name;
-      opt.textContent = \`\${v.name} (\${v.lang})\`;
-      voiceSelect.appendChild(opt);
+    function pickByNames(names){
+      for (const n of names){
+        const found = pool.find(v => (v.name||'').toLowerCase().includes(n.toLowerCase()));
+        if (found) return found;
+      }
+      return null;
     }
 
-    const savedName = localStorage.getItem('voiceName');
+    const female = pickByNames(pref.female) || pool[0] || null;
+    const male   = pickByNames(pref.male)   || pool.find(v=>v!==female) || pool[0] || null;
 
-    // 1) se lingua non "auto", prova voce che matcha la lingua scelta
-    const langPrefix = (ttsLang||'').split('-')[0].toLowerCase();
-    const matchLang = (v) => ttsLang !== 'auto' && v.lang && v.lang.toLowerCase().startsWith(langPrefix);
+    return { female, male, pool };
+  }
 
-    pickedVoice =
-      (ttsLang !== 'auto' && voices.find(matchLang)) ||
-      (savedName && voices.find(v => v.name === savedName)) ||
-      voices.find(v => /en-(us|gb)/i.test(v.lang)) || // fallback EN
-      voices[0] || null;
+  function populateVoiceSelect(){
+    // mostra SOLO Female/Male per la lingua scelta
+    voiceSelect.innerHTML = '';
+    const cand = getCandidatesByLang(ttsLang);
 
-    if (pickedVoice) voiceSelect.value = pickedVoice.name;
+    const opts = [];
+    if (cand.female) opts.push({key:'female', label:'Female', v:cand.female});
+    if (cand.male)   opts.push({key:'male',   label:'Male',   v:cand.male});
+
+    for (const o of opts){
+      const option = document.createElement('option');
+      option.value = o.key;
+      option.textContent = o.label;
+      voiceSelect.appendChild(option);
+    }
+
+    // seleziona gender salvato se presente
+    if (![...voiceSelect.options].some(o=>o.value===ttsGender)){
+      ttsGender = 'female';
+    }
+    voiceSelect.value = ttsGender;
+
+    // set pickedVoice coerente
+    pickedVoice = (ttsGender === 'male' ? cand.male : cand.female) || cand.pool[0] || null;
+    if (pickedVoice){
+      localStorage.setItem('voiceName', pickedVoice.name || '');
+    }
+  }
+
+  function loadVoices(){
+    voices = window.speechSynthesis ? (window.speechSynthesis.getVoices() || []) : [];
+    populateVoiceSelect();
   }
 
   if ('speechSynthesis' in window){
-    populateSelect();
-    window.speechSynthesis.onvoiceschanged = populateSelect;
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
   }
 
   function warmUpSpeak(){
     try{
       const u = new SpeechSynthesisUtterance('Voice enabled.');
       if (pickedVoice) u.voice = pickedVoice;
-      u.lang = (ttsLang !== 'auto') ? ttsLang : (pickedVoice?.lang || 'en-US');
+      u.lang = pickedVoice?.lang || ttsLang;
       u.rate = 1; u.pitch = 1; u.volume = 1;
       const resumeHack = setInterval(()=>{
         if (speechSynthesis.speaking) speechSynthesis.resume(); else clearInterval(resumeHack);
@@ -225,8 +253,7 @@ app.get('/', (req, res) => {
     try{
       const u = new SpeechSynthesisUtterance(text);
       if (pickedVoice) u.voice = pickedVoice;
-      const autoLang = detectLangFromText(text);
-      u.lang = (ttsLang !== 'auto') ? ttsLang : (pickedVoice?.lang || autoLang || 'en-US');
+      u.lang = pickedVoice?.lang || ttsLang;
       u.rate = 1; u.pitch = 1; u.volume = 1;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
@@ -242,15 +269,15 @@ app.get('/', (req, res) => {
   });
 
   voiceSelect.addEventListener('change', () => {
-    const name = voiceSelect.value;
-    pickedVoice = voices.find(v => v.name === name) || null;
-    localStorage.setItem('voiceName', name);
+    ttsGender = voiceSelect.value; // female|male
+    localStorage.setItem('ttsGender', ttsGender);
+    populateVoiceSelect(); // riallinea pickedVoice
   });
 
   langSelect.addEventListener('change', () => {
-    ttsLang = langSelect.value;               // 'auto' | 'en-US' | 'it-IT' | ...
+    ttsLang = langSelect.value;          // en-US | it-IT | es-ES | fr-FR | de-DE
     localStorage.setItem('ttsLang', ttsLang);
-    populateSelect();                         // ricalcola voce preferita per la nuova lingua
+    populateVoiceSelect();               // ricalcola le 2 opzioni per la lingua
   });
 
   // Chat helpers
