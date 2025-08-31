@@ -1,4 +1,4 @@
- // index.js — Guest Assistant (Via Leonina 71) — Multilingual + Native Voices
+// index.js — Guest Assistant (Via Leonina 71) — Multilingual + Native Voices
 
 import express from 'express';
 import cors from 'cors';
