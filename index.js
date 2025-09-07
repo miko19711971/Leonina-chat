@@ -631,7 +631,7 @@ async function send(){
   const text=(input.value||'').trim(); if(!text) return;
   add('me', text); input.value='';
   try{
-    const r=await fetch('/api/message',{
+    const r=await fetch('./api/message', { ... })
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({message:text, lang})
@@ -655,5 +655,6 @@ welcome();
 });
 
 // ---------------- Start ----------------
-const port = process.env.PORT || 8787;
-app.listen(port, ()=>console.log('Guest assistant up on http://localhost:'+port));
+const port = process.env.PORT || 8787; 
+export default app;
+
