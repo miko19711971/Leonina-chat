@@ -1,13 +1,19 @@
 {
-  "name": "guest_assistant_leonina",
+  "name": "leonina-chat",
+  "version": "1.0.0",
+  "description": "Guest assistant for Via Leonina 71 (flat repo)",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
     "cors": "^2.8.5",
-    "openai": "^4.60.0"
+    "express": "^4.19.2",
+    "openai": "^4.53.0"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": "20.x"
+  },
+  "license": "MIT"
 }
