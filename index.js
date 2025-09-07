@@ -655,6 +655,9 @@ welcome();
 });
 
 // ---------------- Start ----------------
-const port = process.env.PORT || 8787; 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Guest Assistant running on port ${PORT}`);
+});
 export default app;
 
